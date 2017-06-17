@@ -455,12 +455,75 @@
          };
 
         /*
-        *   
+        *  随机返回数组的一项
         * */
+        Array.prototype.random = function (n) {    //?????
+            //Math.floor():向下取整。Math.floor(1.8) -> 1
+            //Math.ceil():向上取整。Math.ceil(1.1) -> 2
+            //v = Math.random() * n:会产生一个 0 < v < nv的数
+            //v2 = Math.floor(Math.random() * n)：v2为一个大于等于0，小于n的整数
+            return this[Math.floor(Math.random()*n) || this.length]
+        }
 
+        /*去掉数组中的目标元素*/  //？？？？
+        Array.prototype.without = function() {
+            var args = [].slice.call(arguments).unique(),
+                i = 0, l = this.length,
+                j = 0, k = args.length;
+
+            for(; i < l; ++i) {
+                for(; j < k; ++j) {
+                    if(this[i] === args[j]) {
+                        this.splice(i, 1);
+                    }
+                }
+                j = 0;//将j归0，以便下次循环
+            }
+            return this;
+        };
+
+
+        /* 递归将数组扁平化*/  //？？？？
+        Array.prototype.flatten = function() {
+            var ret = [], i = 0, l = this.length, tmp, toString = ({}).toString;
+            for(; i < l; ++i) {
+                tmp = this[i];
+                if(toString.call(tmp) === '[object Array]') {
+                    ret = ret.concat(tmp.flatten());
+                } else {
+                    ret.push(tmp);
+                }
+            }
+            return ret;
+        };
+
+        /*
+        *   删除数组指定位置的项
+        * */
+        Array.prototype.removeAt = function (pos) {
+            this.splice(pos,1);
+            return this;
+        }
+
+        /*
+        *   检测数组是否包含目标值
+        *   如果包含就返回true,否则返回false
+        * */
+        Array.prototype.contains = function (target) {
+            var l = this.length;
+            for( var i=0;i<l;i++ ){
+                if(!(this[i]===target))
+                    continue;
+                return true;
+            }
+            return false;
+        };
     }
     /* 对function类进行扩展 */
-
+    functionExtend()
+    function functionExtend() {
+        
+    }
 
 
 })()
