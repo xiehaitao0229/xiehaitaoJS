@@ -171,7 +171,7 @@
         *   求数组的最大项
         *   传统的方法只能够计算两个之间的最大值和最小值
         * */
-        Array.prototype.max = function () {
+       /* Array.prototype.max = function () {      //  这种方法可以求数组的最大值，但是性能不好
             //  使用递归的思想
             return cacl(this,function (item,max) {
                 if(max>item){
@@ -180,7 +180,12 @@
                     return item;
                 }
             })
-        };
+        };*/
+       //  提高求数组最大值性能的方法
+        Array.prototype.max = function () {
+            return Math.max.apply(null,this);
+        }
+
 
         /*
         *   求数组的最小项
@@ -315,7 +320,7 @@
         *   返回数组与目标数组的并集组成的数组
         * */
         Array.prototype.union = function (target) {
-            return this.concat(target).unique();
+            return this.concat(target);
         };
 
         /*
@@ -522,8 +527,107 @@
     /* 对function类进行扩展 */
     functionExtend()
     function functionExtend() {
-        
+        Function.prototype.before = function (func) {
+            var __self = this
+            return function () {
+                if(func.apply(this,arguments)===false){
+                    return false;
+                }
+                return __self.apply(this.arguments);
+            }
+        }
+        Function.prototype.after = function (func) {   //  ???
+            var _self = this;
+            return function () {
+                var ret = _self.apply(this,arguments);
+                if( ret === false){
+                    return false;
+                }
+                func.apply( this,arguments );
+                return ret;
+            }
+        }
     }
-
-
 })()
+
+/* 主框架 */
+(function (w) {
+    /* 双对象法则 - 第一个对象 */
+    var F = function (selector, context) {
+        return this.init(selector,context);
+    };
+    F.prototype.init = function (selector, context) {
+        var that = this;
+        that.length = 0;  //  初始化伪数组的长度
+        if(!selector){
+            return that;
+        }
+        if(typeof selector==='string'){
+            var nodeList = (context || document).querySelector(selector); //  获得所有dom元素
+            that.length = nodeList.length;  // 伪数组的长度就是所有dom元素的长度
+            //  这里遍历应从第一个开始到倒数第二个，而不是最后一个，因为最后一个属性是length
+            for( var i=0;i<this.length;i+=1 ){
+                that[i] = nodeList[i];
+            }
+        }else if(selector.nodeType){
+            that[0] = selector;
+            that.length++; //  给伪数组的长度自增
+        }
+        return that;
+    };
+
+    /*双对象法则 - 第二个对象*/
+    /*
+     *  这里xiehaitao可以看做一个json对象
+     *  这里的是双管齐下，
+     *  判断一下selector类型是不是function，如果是的话，window.onload = selector;
+     *  如果不是的话就是字符串类型
+     *  $(function(){
+     *    $('#div').click(function(){
+     $(".div").first().html('王书奎')
+     $(".div").last().html(' 王书奎')
+     })
+     *  })
+     *  等价于
+     *  window.onload = function(){
+     *   $('#div').click(function(){
+     $(".div").first().html('王书奎')
+     $(".div").last().html(' 王书奎')
+     })
+     *  }
+     * */
+    var xiehaitao = function (selector, context) {
+        if(typeof  selector==='function'){
+            window.onload = selector;
+        }else{
+            return new F(selector,context);
+        }
+    };
+
+    /* extend方法就是把一个对象所有的属性和方法拷贝到另一个对象 */
+    xiehaitao.extend = function () {
+        /* 这段代码的意思：
+         如果只传递一个参数，表示给F对象添加功能--需要参与链式访问的
+         如果传递两个参数，表示给指定的对象添加功能*/
+        var key
+            ,arg = arguments
+            ,i = 1
+            ,len = arg.length
+            ,target = null;
+        if(len === 0){
+            return;
+        }else if(len === 1){
+            target = F.prototype;
+            i--;
+        }else{
+            target = arg[0];
+        }
+
+        for(; i < len; i++){
+            for(key in arg[i]){
+                target[key] = arg[i][key];
+            }
+        }
+        return target;
+    }
+})(window)
