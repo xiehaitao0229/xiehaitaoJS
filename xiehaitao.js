@@ -320,7 +320,7 @@
         *   返回数组与目标数组的并集组成的数组
         * */
         Array.prototype.union = function (target) {
-            return this.concat(target);
+            return this.concat(target).unique();
         };
 
         /*
