@@ -548,7 +548,7 @@
             }
         }
     }
-})()
+})();
 
 /* 主框架 */
 (function (w) {
@@ -630,4 +630,85 @@
         }
         return target;
     }
-})(window)
+})(window);
+
+/* 公共函数 */
+(function(itcast){
+    //公共模块
+    /*需要链式访问*/
+    itcast.extend({
+        each : function(fn) {
+            var i=0, length = this.length;
+            for (; i<length; i+=1) {
+                fn.call(this[i]);
+                //fn.call(this.element[i],i,this.element[i]);
+            }
+            return this;
+        }
+    });
+    /*不需要链式访问*/
+    /*公共*/
+    itcast.extend(itcast, {
+
+    });
+    /*字符串*/
+    itcast.extend(itcast, {
+        camelCase : function(str){
+            return str.replace(/\-(\w)/g, function(all, letter){
+                return letter.toUpperCase();
+            });
+        },
+        //将json转换成字符串
+        sjson:function (json) {
+            return JSON.stringify(json);
+        },
+        //将字符串转成json
+        json:function (str) {
+            return eval(str);
+        }
+    });
+    /*数组*/
+    itcast.extend(itcast, {
+
+    });
+    /*Math*/
+    itcast.extend(itcast, {
+        //随机数
+        random: function (begin, end) {
+            return Math.floor(Math.random() * (end - begin)) + begin;
+        },
+    });
+    /*数据类型校验*/
+    itcast.extend(itcast, {
+        //数据类型检测
+        isNumber:function (val){
+            return typeof val === 'number' && isFinite(val)
+        },
+        isBoolean:function (val) {
+            return typeof val ==="boolean";
+        },
+        isString:function (val) {
+            return typeof val === "string";
+        },
+        isUndefined:function (val) {
+            return typeof val === "undefined";
+        },
+        isObj:function (str){
+            if(str === null || typeof str === 'undefined'){
+                return false;
+            }
+            return typeof str === 'object';
+        },
+        isNull:function (val){
+            return  val === null;
+        },
+        isArray:function (arr) {
+            if(arr === null || typeof arr === 'undefined'){
+                return false;
+            }
+            return arr.constructor === Array;
+        }
+    });
+
+
+})(itcast);
